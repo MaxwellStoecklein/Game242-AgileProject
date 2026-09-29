@@ -2,10 +2,14 @@ using UnityEngine;
 
 public abstract class Actor : MonoBehaviour
 {
-    public string name;
     
-    public int health;
+    // TODO: Privatize most of the properties.
+    [SerializeField] private string name;
+
+    [SerializeField] private int health;
     public int maxHealth;
+
+    [SerializeField] private GameObject selectionPointer;
     
     public Actor(string newName, int newMaxHealth)
     {

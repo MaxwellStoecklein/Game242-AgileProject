@@ -1,1 +1,1 @@
-test
+Saving projected position is not meant for enemies to adaptively predict your movement as they will attack before you're allowed to move. It's only to ensure enemies don't try to move into the spot you're reserving once everyone is allowed to move.
