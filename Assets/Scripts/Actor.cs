@@ -1,15 +1,43 @@
+using System.Collections;
 using UnityEngine;
 
 public abstract class Actor : MonoBehaviour
 {
     
     // TODO: Privatize most of the properties.
-    [SerializeField] private string name;
-
+    [SerializeField] private string unitName;
     [SerializeField] private int health;
-    public int maxHealth;
+    [SerializeField] private int maxHealth;
+    [SerializeField] private Vector3Int position;
 
     [SerializeField] private GameObject selectionPointer;
+
+    #region Setters
+
+    public void SetName(string name)
+    {
+        unitName = name;
+    }
+
+    public void SetMaxHealth(int newMaxHealth)
+    {
+        maxHealth = newMaxHealth;
+    }
+
+    public void SetPosition(Vector3Int position)
+    {
+        this.position = position;
+    }
+
+    #endregion
+    
+    #region Getters
+    
+    public string GetName() => unitName;
+    public int GetHealth() => health;
+    public int GetMaxHealth() => maxHealth;
+    
+    #endregion
     
     public Actor(string newName, int newMaxHealth)
     {
@@ -18,13 +46,33 @@ public abstract class Actor : MonoBehaviour
         health = newMaxHealth;
     }
 
-    public void Move()
+    public Actor()
     {
-        Debug.Log($"Actor {name} moved.");
+        name = "";
+        maxHealth = 10;
+        health = maxHealth;
     }
 
-    public void Act()
+    public IEnumerator Move(Vector3Int direction)
     {
-        Debug.Log($"Actor {name} acted.");
+        float timer = 0f;
+        Vector3 oldPos = position;
+        Vector3 newPos = GridManager.instance.StageMap.CellToWorld(position + direction);
+        while (timer < 0.5f)
+        {
+            transform.position = Vector3.Lerp(oldPos, newPos, timer / 0.5f);
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = newPos;
+        position += direction;
+    }
+
+    public IEnumerator Act()
+    {
+        while (false)
+            yield return null;
+        Debug.Log($"Actor {unitName} acted.");
     }
 }
