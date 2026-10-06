@@ -5,13 +5,29 @@ public abstract class Actor : MonoBehaviour
 {
     
     // TODO: Privatize most of the properties.
-    [SerializeField] private string unitName;
-    [SerializeField] private int health;
-    [SerializeField] private int maxHealth;
-    [SerializeField] private Vector3Int position;
+    [SerializeField] protected string unitName;
+    [SerializeField] protected int health;
+    [SerializeField] protected int maxHealth;
+    [SerializeField] protected Vector3 position;
 
-    [SerializeField] private GameObject selectionPointer;
+    [SerializeField] protected GameObject selectionPointer;
 
+
+    [SerializeField] protected bool isLeader;
+
+    public class Action
+    {
+        public enum ActionType
+        {
+            Act,
+            Move,
+            Idle
+        }
+        
+        public ActionType actionType;
+        public Vector3 destination;
+    }
+    
     #region Setters
 
     public void SetName(string name)
@@ -24,9 +40,14 @@ public abstract class Actor : MonoBehaviour
         maxHealth = newMaxHealth;
     }
 
-    public void SetPosition(Vector3Int position)
+    public void SetPosition(Vector3 position)
     {
         this.position = position;
+    }
+
+    public void SetLeader(bool leader = true)
+    {
+        isLeader = leader;
     }
 
     #endregion
@@ -36,6 +57,8 @@ public abstract class Actor : MonoBehaviour
     public string GetName() => unitName;
     public int GetHealth() => health;
     public int GetMaxHealth() => maxHealth;
+    public Vector3 GetPosition() => position;
+    public bool IsLeader() => isLeader;
     
     #endregion
     
@@ -44,6 +67,7 @@ public abstract class Actor : MonoBehaviour
         name = newName;
         maxHealth = newMaxHealth;
         health = newMaxHealth;
+        isLeader = false;
     }
 
     public Actor()
@@ -51,13 +75,14 @@ public abstract class Actor : MonoBehaviour
         name = "";
         maxHealth = 10;
         health = maxHealth;
+        isLeader = false;
     }
 
-    public IEnumerator Move(Vector3Int direction)
+    /*public IEnumerator Move(Vector3Int direction)
     {
         float timer = 0f;
         Vector3 oldPos = position;
-        Vector3 newPos = GridManager.instance.StageMap.CellToWorld(position + direction);
+        Vector3 newPos = GridManager.instance.StageMap.CellToWorld((Vector3Int)(position + direction));
         while (timer < 0.5f)
         {
             transform.position = Vector3.Lerp(oldPos, newPos, timer / 0.5f);
@@ -67,12 +92,27 @@ public abstract class Actor : MonoBehaviour
 
         transform.position = newPos;
         position += direction;
+    }*/
+    
+    
+
+    public void MoveTick(float timer, float duration, Vector3 destination)
+    {
+        transform.position = Vector3.Lerp(position, destination, timer / duration);
     }
 
     public IEnumerator Act()
     {
-        while (false)
+        Color temp = GetComponentInChildren<SpriteRenderer>().color;
+        GetComponentInChildren<SpriteRenderer>().color = Color.white;
+        float timer = 0f;
+        while (timer < 0.3f)
+        {
             yield return null;
-        Debug.Log($"Actor {unitName} acted.");
+            timer += Time.deltaTime;
+        }
+        GetComponentInChildren<SpriteRenderer>().color = temp;
+        
+        //Debug.Log($"Actor {unitName} acted.");
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -21,13 +22,15 @@ public class TurnSystem : MonoBehaviour
     public GameObject enemyPrefab;
     
     private List<Actor> actors = new();
-    private List<Actor> turnList = new();
+    
+    private Dictionary<Actor, Actor.Action> moveQueue = new();
+    private Dictionary<Actor, Actor.Action> actionQueue = new();
+    
     private int currentActorTurn = -1;
     private Actor currentActor;
 
-    Random random;
-
     private bool listenInputs = false;
+    public bool manualMode = true;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,18 +45,18 @@ public class TurnSystem : MonoBehaviour
 
     void InitTurnOrderState()
     {
-        random.InitState();
         for (int i = 0; i < 10; i++)
         {
             if (i == 0)
             {
                 AddActor(playerPrefab);
+                actors[i].SetLeader();
                 continue;
             }
             
             if (actors.FindAll(FindPlayer).Count < 4)
             {
-                if (random.NextInt(0, 2) == 0)
+                if (RngManager.instance.SpawnRandom.NextInt(0, 2) == 0)
                 {
                     AddActor(playerPrefab);
                 }
@@ -66,19 +69,10 @@ public class TurnSystem : MonoBehaviour
             {
                 AddActor(enemyPrefab);
             }
-            
-            //StartCoroutine(PlayerState());
-            
-            // Start turns
         }
         NextTurn();
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="actor"></param>
-    /// <param name="index"></param>
     void AddActor(GameObject actor)
     {
         Actor temp;
@@ -88,15 +82,16 @@ public class TurnSystem : MonoBehaviour
 
         foreach (Actor entity in actors)
         {
-            Vector3Int newPos = new Vector3Int(random.NextInt(-9, 9), random.NextInt(-5, 5), 0);
+            Vector3Int newPos = new Vector3Int(RngManager.instance.SpawnRandom.NextInt(-9, 9), 
+                RngManager.instance.SpawnRandom.NextInt(-5, 5), 0);
             while (FindMatchingPosition(newPos))
             {
-                newPos.x = random.NextInt(-9, 9);
-                newPos.y = random.NextInt(-5, 5);
+                newPos.x = RngManager.instance.SpawnRandom.NextInt(-9, 9);
+                newPos.y = RngManager.instance.SpawnRandom.NextInt(-5, 5);
             }
 
             entity.SetPosition(new Vector3Int(newPos.x, newPos.y, 0));
-            entity.transform.position = new Vector3(newPos.x, newPos.y, 0); // TODO: Replace with " position = Tilemap.GetPosition(x,y) "
+            entity.transform.position = new Vector3(newPos.x, newPos.y, 0);
         }
             
             
@@ -124,21 +119,37 @@ public class TurnSystem : MonoBehaviour
         // Player or enemy turn?
         currentActorTurn = (currentActorTurn + 1) % actors.Count;
         currentActor = actors[currentActorTurn];
-        Debug.Log($"Turn {currentActor.GetName()} started.\n" +
-                  $"Actor is {currentActor.GetType().ToString()}");
+        Debug.Log($"Turn {currentActor.GetName()} started.\n" + $"Actor is {currentActor.GetType().ToString()}");
 
         if (currentActor is Player)
         {
-            Debug.Log("Starting player turn.");
-            StartPlayerTurn();
+            //Debug.Log("Starting player turn.");
+            if (manualMode)
+            {
+                StartPlayerTurn();
+            }
+            else if (currentActor.IsLeader())
+            {
+                StartPlayerTurn();
+            }
+            else
+            {
+                StartPlayerAITurn();
+            }
         }
         else
         {
-            Debug.Log("Starting enemy turn.");
+            //Debug.Log("Starting enemy turn.");
             StartEnemyTurn();
         }
     }
 
+    void StartPlayerAITurn()
+    {
+        Actor.Action playerAIAction = ((Player)currentActor).ChooseAction();
+        StartCoroutine(ExecuteAction(playerAIAction));
+    }
+    
     void StartPlayerTurn()
     {
         // On turn start checks (e.g DoTs, )
@@ -149,36 +160,110 @@ public class TurnSystem : MonoBehaviour
         
         // await input response
         listenInputs = true;
-        Debug.Log("Set listen inputs to true");
+        //Debug.Log("Set listen inputs to true");
     }
 
     void StartEnemyTurn()
     {
-        StartCoroutine(EnemyTurn());
+        Actor.Action enemyAction = ((Enemy)currentActor).ChooseAction();
+        StartCoroutine(ExecuteAction(enemyAction));
     }
 
-    IEnumerator EnemyTurn()
+    IEnumerator ExecuteAction(Actor.Action action)
     {
-        yield return ((Enemy)currentActor).ChooseAction();
+        if (action.actionType == Actor.Action.ActionType.Move)
+        {
+            Debug.Log($"Actor {currentActor.GetName()} moved.");
+            moveQueue.Add(currentActor, action);
+        }
+        else if (action.actionType == Actor.Action.ActionType.Act)
+        {
+            if (currentActor is Player)
+            {
+                yield return StartCoroutine(MoveQueueCoroutine());
+                yield return StartCoroutine(ActQueueCoroutine());
+                Debug.Log($"Actor {currentActor.GetName()} executed act! They're a player so they skipped queue.");
+                yield return StartCoroutine(PlayerActCoroutine());
+            }
+            else
+            {
+                Debug.Log($"Actor {currentActor.GetName()} acted. They're an enemy so their act was held.");
+                actionQueue.Add(currentActor, action);
+            }
+        }
+
+        if (actors[(currentActorTurn + 1) % actors.Count] is Player)
+        {
+            if (manualMode || actors[(currentActorTurn + 1) % actors.Count].IsLeader())
+            {
+                yield return StartCoroutine(MoveQueueCoroutine());
+
+                yield return StartCoroutine(ActQueueCoroutine());
+            }
+            /*else if (!manualMode)
+            {
+                foreach (var queuedActor in actionQueue)
+                {
+                    Debug.Log($"Actor {queuedActor.Key.GetName()} executed act!");
+                    yield return StartCoroutine(queuedActor.Key.Act()); // TODO: Change to some kinda ai act coro
+                }
+            }*/
+        }
         
-        Debug.Log($"Enemy {currentActor.GetName()} moved.");
         NextTurn();
     }
 
-    IEnumerator PlayerMoveCoroutine()
+    IEnumerator ActQueueCoroutine()
     {
-        yield return currentActor.Move(new Vector3Int(0, 1, 0));
+        foreach (var queuedActor in actionQueue)
+        {
+            Debug.Log($"Actor {queuedActor.Key.GetName()} executed act!");
+            yield return StartCoroutine(queuedActor.Key.Act()); // TODO: Change to some kinda ai act coro
+        }
+        actionQueue.Clear();
+    }
+    
+    IEnumerator MoveQueueCoroutine()
+    {
+        float timer = 0f;
+        float gameSpeed = 0.5f; // TODO: When creating config system, make this configurable
+
+        while (timer < gameSpeed)
+        {
+            foreach (var queuedActor in moveQueue)
+            {
+                queuedActor.Key.MoveTick(timer, gameSpeed, queuedActor.Value.destination);
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        foreach (var queuedActor in moveQueue)
+        {
+            Debug.Log($"Actor {queuedActor.Key.GetName()} executed move!");
+            
+            queuedActor.Key.SetPosition(queuedActor.Value.destination);
+        }
+        moveQueue.Clear();
+    }
+
+    void PlayerMove(Vector3Int direction)
+    {
+        Actor.Action playerAction = new Actor.Action();
+        playerAction.destination = GridManager.instance.StageMap.CellToWorld(
+            new Vector3Int((int)math.round(currentActor.GetPosition().x),
+                (int)math.round(currentActor.GetPosition().y)) +
+            direction);
+        playerAction.actionType = Actor.Action.ActionType.Move;
         
-        Debug.Log($"Actor {currentActor.GetName()} moved.");
-        NextTurn();
+        
+        StartCoroutine(ExecuteAction(playerAction));
     }
 
     IEnumerator PlayerActCoroutine()
     {
         yield return currentActor.Act();
-        
-        Debug.Log($"Actor {currentActor.GetName()} acted.");
-        NextTurn();
     }
 
     // Update is called once per frame
@@ -186,17 +271,22 @@ public class TurnSystem : MonoBehaviour
     {
         if (listenInputs)
         {
-            if (actions.Player.mv.triggered)
+            /*if (actions.Player.Move.ReadValue<Vector2>().magnitude > 0.1)
+            {
+                
+            }*/
+            
+            if (actions.Player.mv.inProgress)
             {
                 listenInputs = false;
-                //currentActor.Move(new Vector3Int(0, 1, 0));
-                //StartCoroutine(currentActor.Move(new Vector3Int(0, 1, 0)));
-                StartCoroutine(PlayerMoveCoroutine());
+                
+                PlayerMove(new Vector3Int(0, 1, 0));
             }
 
             if (actions.Player.act.triggered)
             {
                 listenInputs = false;
+                
                 StartCoroutine(PlayerActCoroutine());
             }
         }
