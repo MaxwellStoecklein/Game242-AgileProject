@@ -248,7 +248,7 @@ public class TurnSystem : MonoBehaviour
         moveQueue.Clear();
     }
 
-    void PlayerMove(Vector3Int direction)
+    public void PlayerMove(Vector3Int direction)
     {
         Actor.Action playerAction = new Actor.Action();
         playerAction.destination = GridManager.instance.StageMap.CellToWorld(

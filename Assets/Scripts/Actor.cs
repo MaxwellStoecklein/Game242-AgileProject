@@ -30,9 +30,9 @@ public abstract class Actor : MonoBehaviour
     
     #region Setters
 
-    public void SetName(string name)
+    public void SetName(string newName)
     {
-        unitName = name;
+        unitName = newName;
     }
 
     public void SetMaxHealth(int newMaxHealth)
@@ -40,9 +40,9 @@ public abstract class Actor : MonoBehaviour
         maxHealth = newMaxHealth;
     }
 
-    public void SetPosition(Vector3 position)
+    public void SetPosition(Vector3 newPosition)
     {
-        this.position = position;
+        this.position = newPosition;
     }
 
     public void SetLeader(bool leader = true)
