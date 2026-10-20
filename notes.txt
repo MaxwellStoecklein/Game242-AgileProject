@@ -21,3 +21,16 @@ right: x > 150 && x <= -150
 down right: x > -150 && x <= -120
 down: x > -120 && x <= -60
 down left: x > -60 && x <= -30
+
+
+
+UI Scripting
+
+-- Open main menu --
+Create panel with a slot for each element.
+From main menu SO, pull list of MenuOptions.
+For each menu option,
+        instantiate discreet button,
+        set MenuOption,
+        set display text to displaytext property of MenuOption,
+Set cursor to pos of top element in both UIManager and MenuControl.
