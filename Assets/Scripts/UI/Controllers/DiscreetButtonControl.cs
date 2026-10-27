@@ -1,7 +1,26 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
-public class DiscreetButtonControl : MenuControl
+[RequireComponent(typeof(Button))]
+public class DiscreetButtonControl: MonoBehaviour
 {
+    public enum OpenBehavior
+    {
+        Standalone,
+        AddWindow
+    }
+
+    public enum RequestType
+    {
+        Action,
+        OpenMenu
+    }
+    
+    public MenuControl targetMenu;
+    public OpenBehavior openBehavior;
+    public RequestType requestType;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,23 +33,14 @@ public class DiscreetButtonControl : MenuControl
         
     }
 
-    public override void InitialSetup()
+    public void PrintName()
     {
-        throw new System.NotImplementedException();
+        Debug.Log(GetComponentInChildren<TMP_Text>().text);
     }
 
-    public override Vector2 MoveCursor(Vector2 dir)
+    public void SendRequest()
     {
-        throw new System.NotImplementedException();
+        GetComponentInParent<PanelControl>().ReceiveRequest(targetMenu, openBehavior, requestType);
     }
-
-    public override void SelectElement()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public override void Back()
-    {
-        throw new System.NotImplementedException();
-    }
+    
 }
