@@ -2158,6 +2158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e8c1c622805ff5aa56d57d9783b447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanelControl
+  elementIndex: 0
 --- !u!114 &334935195577691688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2268,6 +2269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e8c1c622805ff5aa56d57d9783b447, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PanelControl
+  elementIndex: 0
 --- !u!114 &2165652720611484081
 MonoBehaviour:
   m_ObjectHideFlags: 0

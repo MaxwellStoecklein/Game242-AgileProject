@@ -24,7 +24,14 @@ public class DiscreetButtonControl: MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        // TODO
+        ActionListController tmp = GetComponentInParent<ActionListController>();
+        if (tmp != null)
+        {
+            Debug.Log("Ready");
+            tmp.ChildReady();
+        }
+
     }
 
     // Update is called once per frame

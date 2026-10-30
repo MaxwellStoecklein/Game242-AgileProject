@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -7,7 +8,7 @@ using UnityEngine.UI;
 public class PanelControl : MenuControl
 {
     private List<DiscreetButtonControl> elements = new ();
-    int elementIndex = 0;
+    public int elementIndex = 0;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -20,6 +21,11 @@ public class PanelControl : MenuControl
         
     }
 
+    private void OnEnable()
+    {
+        //InitialSetup();
+    }
+
     public override void InitialSetup()
     {
         if (elements.Count > 0)
@@ -27,28 +33,60 @@ public class PanelControl : MenuControl
             elements.Clear();
             Debug.LogWarning($"WARNING: Elements of {gameObject.name} have been cleared!");
         }
+        Debug.Log($"{gameObject.name} has been initialized!");
         
+        ToggleChildButtons(true);
         List<DiscreetButtonControl> tmp = GetComponentsInChildren<DiscreetButtonControl>().ToList();
         foreach (DiscreetButtonControl button in tmp)
             elements.Add(button);
+        Debug.Log($"Element count: {elements.Count}");
+        Debug.Log($"My name: {gameObject.name}");
+        Debug.Log($"Element 0 pos: {elements[0].gameObject.transform.position}");
+        Debug.Log($"Element 0 name:  {elements[0].gameObject.name}");
+
+        elementIndex = 0;
         
-        ToggleChildButtons(true);
+        /*Vector2 pos = elements[elementIndex].gameObject.transform.position;
+        Debug.Log($"Position: {pos}");
+        pos.x -= elements[elementIndex].gameObject.GetComponent<RectTransform>().sizeDelta.x / 2;
+        Debug.Log($"Adjusted Position: {pos}");
+        UIManager.instance.InitCursor(pos);*/
+        UIManager.instance.InitCursor();
     }
 
     public override Vector2 MoveCursor(Vector2 dir)
     {
+        Debug.Log($"My name: {gameObject.name}");
+        Debug.Log($"Element 0 pos: {elements[0].gameObject.transform.position}");
+        Debug.Log($"Element 0 name:  {elements[0].gameObject.name}");
+        
+        dir *= -1;
         if (elementIndex + Mathf.RoundToInt(dir.y) < elements.Count && 
             elementIndex + Mathf.RoundToInt(dir.y) >= 0)
         {
             elementIndex += Mathf.RoundToInt(dir.y);
             Vector2 pos = elements[elementIndex].gameObject.transform.position;
+            Debug.Log($"Pos: {pos}");
             pos.x -= elements[elementIndex].gameObject.GetComponent<RectTransform>().sizeDelta.x / 2;
             return pos;
         }
-        else
+        else if (elementIndex + Mathf.RoundToInt(dir.y) >= elements.Count)
         {
-            return Vector2.zero;
+            elementIndex = 0;
+            Vector2 pos = elements[elementIndex].gameObject.transform.position;
+            Debug.Log($"Pos: {pos}");
+            pos.x -= elements[elementIndex].gameObject.GetComponent<RectTransform>().sizeDelta.x / 2;
+            return pos;
         }
+        else if (elementIndex + Mathf.RoundToInt(dir.y) < 0)
+        {
+            elementIndex = elements.Count - 1;
+            Vector2 pos = elements[elementIndex].gameObject.transform.position;
+            Debug.Log($"Pos: {pos}");
+            pos.x -= elements[elementIndex].gameObject.GetComponent<RectTransform>().sizeDelta.x / 2;
+            return pos;
+        }
+        return Vector2.zero;
     }
 
     public override void SelectElement()
@@ -82,8 +120,8 @@ public class PanelControl : MenuControl
                 else
                 {
                     ToggleChildButtons(false);
-                    targetMenu.gameObject.SetActive(true);
                     UIManager.instance.SetCurrentMenu(targetMenu);
+                    targetMenu.gameObject.SetActive(true);
                 }
                 break;
         }

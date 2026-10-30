@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,13 +7,16 @@ using UnityEngine;
 public class ActionListController : MonoBehaviour
 {
     bool started = false;
+    int readyCount = 0;
     
     List<DiscreetButtonControl> elements = new List<DiscreetButtonControl>(); // TODO: Turn into dict with <Ctrk, Action> pair
     
     private void OnEnable()
     {
+        Debug.Log("ActionListController OnEnable");
         if (started)
         {
+            Debug.Log("Started bool true");
             // Get current character's list of actions
             
             foreach (DiscreetButtonControl ctrl in elements)
@@ -34,9 +38,24 @@ public class ActionListController : MonoBehaviour
         
             elements[1].GetComponentInChildren<TMP_Text>().text = "Bash";
             elements[2].GetComponentInChildren<TMP_Text>().text = "Focus";
-        
+            
             GetComponent<PanelControl>().InitialSetup();
+
         }
+    }
+
+    IEnumerator WaitForChildrenReady()
+    {
+        while (readyCount < elements.Count)
+        {
+            yield return null;
+        }
+        gameObject.SetActive(false);
+    }
+
+    public void ChildReady()
+    {
+        readyCount++;
     }
 
     private void OnDisable()
@@ -49,8 +68,8 @@ public class ActionListController : MonoBehaviour
     {
         elements.AddRange(gameObject.GetComponentsInChildren<DiscreetButtonControl>());
         
-        gameObject.SetActive(false);
         started = true;
+        StartCoroutine(WaitForChildrenReady());
     }
 
     // Update is called once per frame

@@ -48,6 +48,16 @@ public class UIManager : MonoBehaviour
     {
         menu.InitialSetup();
     }
+
+    public void InitCursor()
+    {
+        if (currentMenu != null)
+        {
+            Debug.Log("InitCursor ran");
+            //cursor.transform.position = position;
+            MoveCursor(new Vector2(1f, 0f));
+        }
+    }
     
     public void MoveCursor(Vector2 dir)
     {
