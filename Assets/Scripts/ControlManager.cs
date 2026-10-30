@@ -10,7 +10,13 @@ public class ControlManager : MonoBehaviour
     {
         PlayerControls = new InputSystem_Actions();
         PlayerControls.Enable();
-        PlayerControls.Player.Move.performed += DirectionInput;
+        //PlayerControls.Player.Move.performed += DirectionInput;
+
+        PlayerControls.Player.Move.performed += MenuNav;
+        PlayerControls.Player.Attack.performed += Select;
+        PlayerControls.Player.Back.performed += Back;
+        PlayerControls.Player.Menu.performed += OpenMenu;
+
     }
 
     // Update is called once per frame
@@ -19,6 +25,25 @@ public class ControlManager : MonoBehaviour
         
     }
 
+    void MenuNav(InputAction.CallbackContext input)
+    {
+        UIManager.instance.MoveCursor(input.ReadValue<Vector2>());
+    }
+
+    void Select(InputAction.CallbackContext input)
+    {
+        UIManager.instance.SelectElement();
+    }
+
+    void Back(InputAction.CallbackContext input)
+    {
+        UIManager.instance.Back();
+    }
+
+    void OpenMenu(InputAction.CallbackContext input)
+    {
+        UIManager.instance.OpenMenu();
+    }
     
     /*
      * left: x > -30 && x <= 30

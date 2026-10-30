@@ -9,11 +9,10 @@ public abstract class Actor : MonoBehaviour
     [SerializeField] protected int health;
     [SerializeField] protected int maxHealth;
     [SerializeField] protected Vector3 position;
-
     [SerializeField] protected GameObject selectionPointer;
-
-
     [SerializeField] protected bool isLeader;
+
+    [SerializeField] protected string statSheet;
 
     public class Action
     {

@@ -831,7 +831,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2089600951
 Transform:
   m_ObjectHideFlags: 0
@@ -863,6 +863,8 @@ MonoBehaviour:
   panelPrefab: {fileID: 1240324699563840830, guid: 31c7b7b4fc5550507a2529aadc946047, type: 3}
   textPrefab: {fileID: 7023241117375615870, guid: df2ba3064b9df5f7490db57c49822c09, type: 3}
   discreetButtonPrefab: {fileID: 3586566323400716613, guid: 653de069e7b31fab296a59806eb23d79, type: 3}
+  currentMenu: {fileID: 0}
+  cursor: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

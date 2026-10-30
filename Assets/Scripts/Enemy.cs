@@ -10,10 +10,13 @@ public class Enemy : Actor
     {
     }
 
-    public Action ChooseAction()
+    public IEntityAction ChooseAction()
     {
-        Action action = new Action();
-        switch (RngManager.instance.AIRandom.NextInt(0, 2))
+        IEntityAction action;
+        action = new FlashSkill();
+        
+        // Action action = new Action();
+        /*switch (RngManager.instance.AIRandom.NextInt(0, 2))
         {
             case 1:
                 action.actionType = Action.ActionType.Move;
@@ -31,7 +34,7 @@ public class Enemy : Actor
             case 2:
                 action.actionType = Action.ActionType.Act;
                 break;
-        }
+        }*/
 
         return action;
     }

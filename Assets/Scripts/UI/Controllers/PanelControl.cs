@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class PanelControl : MenuControl
 {
-    private List<GameObject> elements = new List<GameObject>();
+    private List<DiscreetButtonControl> elements = new ();
+    int elementIndex = 0;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -29,23 +30,38 @@ public class PanelControl : MenuControl
         
         List<DiscreetButtonControl> tmp = GetComponentsInChildren<DiscreetButtonControl>().ToList();
         foreach (DiscreetButtonControl button in tmp)
-            elements.Add(button.gameObject);
+            elements.Add(button);
+        
+        ToggleChildButtons(true);
     }
 
     public override Vector2 MoveCursor(Vector2 dir)
     {
-        throw new System.NotImplementedException();
+        if (elementIndex + Mathf.RoundToInt(dir.y) < elements.Count && 
+            elementIndex + Mathf.RoundToInt(dir.y) >= 0)
+        {
+            elementIndex += Mathf.RoundToInt(dir.y);
+            Vector2 pos = elements[elementIndex].gameObject.transform.position;
+            pos.x -= elements[elementIndex].gameObject.GetComponent<RectTransform>().sizeDelta.x / 2;
+            return pos;
+        }
+        else
+        {
+            return Vector2.zero;
+        }
     }
 
     public override void SelectElement()
     {
-        throw new System.NotImplementedException();
+        elements[elementIndex].GetComponentInChildren<DiscreetButtonControl>().SendRequest();
     }
 
     public override void Back()
     {
-        throw new System.NotImplementedException();
+        gameObject.SetActive(false);
     }
+    
+    
 
     public void ReceiveRequest(MenuControl targetMenu, DiscreetButtonControl.OpenBehavior openBehavior,
         DiscreetButtonControl.RequestType requestType)
@@ -75,14 +91,7 @@ public class PanelControl : MenuControl
 
     public void TestSetup()
     {
-        elements.Add(Instantiate(UIManager.instance.discreetButtonPrefab, gameObject.transform));
-        elements[0].GetComponentInChildren<TMP_Text>().text = "Actions";
         
-        elements.Add(Instantiate(UIManager.instance.discreetButtonPrefab, gameObject.transform));
-        elements[1].GetComponentInChildren<TMP_Text>().text = "Spells";
-        
-        elements.Add(Instantiate(UIManager.instance.discreetButtonPrefab, gameObject.transform));
-        elements[2].GetComponentInChildren<TMP_Text>().text = "Items";
     }
 
     public void ToggleChildButtons(bool active)

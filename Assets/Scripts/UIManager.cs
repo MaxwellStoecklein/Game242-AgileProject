@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
     
     public Stack<MenuControl> menus = new Stack<MenuControl>();
     public MenuControl currentMenu;
+    public MenuControl rootMenu;
 
     public GameObject cursor;
 
@@ -50,25 +51,47 @@ public class UIManager : MonoBehaviour
     
     public void MoveCursor(Vector2 dir)
     {
-        cursor.transform.position = currentMenu.MoveCursor(dir);
+        if (currentMenu != null)
+        {
+            cursor.transform.position = currentMenu.MoveCursor(dir);
+        }
     }
 
     public void SelectElement()
     {
-        currentMenu.SelectElement();
+        if (currentMenu != null)
+        {
+            currentMenu.SelectElement();
+        }
     }
     
     public void Back()
     {
-        currentMenu.Back();
-        currentMenu = menus.Pop();
+        if (currentMenu != null)
+        {
+            currentMenu.Back();
+            currentMenu = menus.Pop();
+            MenuSetup(currentMenu);
+        }
     }
 
     public void FullExit()
     {
-        foreach (MenuControl menu in menus)
+        while (menus.Count > 0)
         {
             Back();
+        }
+        
+        currentMenu.Back();
+        currentMenu = null;
+    }
+
+    public void OpenMenu()
+    {
+        if (currentMenu == null)
+        {
+            rootMenu.gameObject.SetActive(true);
+            currentMenu = rootMenu;
         }
     }
 

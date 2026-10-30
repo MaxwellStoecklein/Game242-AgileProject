@@ -1,0 +1,8 @@
+using System;
+using System.Collections;
+using UnityEngine;
+
+public interface IEntityAction
+{
+    public IEnumerator ActionCoroutine(Actor myActor);
+}

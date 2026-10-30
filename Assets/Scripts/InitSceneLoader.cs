@@ -20,7 +20,7 @@ public class InitSceneLoader : MonoBehaviour
     IEnumerator Waiter()
     {
         yield return new WaitForSeconds(1);
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("TurnOrderTests");
     }
 
     // Update is called once per frame
