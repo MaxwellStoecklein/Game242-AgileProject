@@ -13,28 +13,33 @@ public class Enemy : Actor
     public IEntityAction ChooseAction()
     {
         IEntityAction action;
-        action = new FlashSkill();
         
-        // Action action = new Action();
-        /*switch (RngManager.instance.AIRandom.NextInt(0, 2))
+        switch (RngManager.instance.AIRandom.NextInt(0, 2))
         {
             case 1:
-                action.actionType = Action.ActionType.Move;
+                MoveAction moveAction = new MoveAction();
+                
                 // Rounding parts to avoid lossy float conversion if the float is marginally below the whole
                 // number we're trying to convert to.
                 // We get the position via CellToWorld to make sure target positions are always
                 // accurate even if the tilemap's settings change.
-                action.destination = GridManager.instance.StageMap.CellToWorld(
+                moveAction.destination = GridManager.instance.StageMap.CellToWorld(
                     new Vector3Int((int)math.round(position.x), (int)math.round(position.y)) + 
                     new Vector3Int(
                         RngManager.instance.AIRandom.NextInt(-1, 2),
                     RngManager.instance.AIRandom.NextInt(-1, 2),
                     0));
+                action = moveAction;
                 break;
             case 2:
-                action.actionType = Action.ActionType.Act;
+                FlashSkill flashSkill = new FlashSkill();
+                action = flashSkill;
                 break;
-        }*/
+            default:
+                FlashSkill errorSkill = new FlashSkill();
+                action = errorSkill;
+                break;
+        }
 
         return action;
     }

@@ -14,32 +14,41 @@ public class ActionListController : MonoBehaviour
     private void OnEnable()
     {
         Debug.Log("ActionListController OnEnable");
+
+        if (!started)
+        {
+            elements.AddRange(gameObject.GetComponentsInChildren<DiscreetButtonControl>());
+            started = true;
+        }
+        
+        Debug.Log("Started bool true");
+        // Get current character's list of actions
+            
+        foreach (DiscreetButtonControl ctrl in elements)
+        {
+            InitializeElement(ctrl);
+        }
+        
+        
+        // This section is a placeholder to generate hardcoded actions since we have no stats yet
+        DiscreetButtonControl btn;
+        
+        elements[0].GetComponentInChildren<TMP_Text>().text = "Cut (Functional)";
+        btn = elements[0];
+        // btn.targetMenu = generic action submenu
+        btn.openBehavior = DiscreetButtonControl.OpenBehavior.AddWindow;
+        //btn.requestType = DiscreetButtonControl.RequestType.OpenMenu;
+        btn.requestType = DiscreetButtonControl.RequestType.Action; // TODO: Delete this once submenu is made.
+        //btn.action = the action
+        
+        elements[1].GetComponentInChildren<TMP_Text>().text = "Bash";
+        elements[2].GetComponentInChildren<TMP_Text>().text = "Focus";
+            
+        //GetComponent<PanelControl>().InitialSetup();
+        
         if (started)
         {
-            Debug.Log("Started bool true");
-            // Get current character's list of actions
             
-            foreach (DiscreetButtonControl ctrl in elements)
-            {
-                InitializeElement(ctrl);
-            }
-        
-        
-            // This section is a placeholder to generate hardcoded actions since we have no stats yet
-            DiscreetButtonControl btn;
-        
-            elements[0].GetComponentInChildren<TMP_Text>().text = "Cut (Functional)";
-            btn = elements[0];
-            // btn.targetMenu = generic action submenu
-            btn.openBehavior = DiscreetButtonControl.OpenBehavior.AddWindow;
-            //btn.requestType = DiscreetButtonControl.RequestType.OpenMenu;
-            btn.requestType = DiscreetButtonControl.RequestType.Action; // TODO: Delete this once submenu is made.
-            //btn.action = the action
-        
-            elements[1].GetComponentInChildren<TMP_Text>().text = "Bash";
-            elements[2].GetComponentInChildren<TMP_Text>().text = "Focus";
-            
-            GetComponent<PanelControl>().InitialSetup();
 
         }
     }
@@ -66,10 +75,10 @@ public class ActionListController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        elements.AddRange(gameObject.GetComponentsInChildren<DiscreetButtonControl>());
+        /*elements.AddRange(gameObject.GetComponentsInChildren<DiscreetButtonControl>());
         
         started = true;
-        StartCoroutine(WaitForChildrenReady());
+        StartCoroutine(WaitForChildrenReady());*/
     }
 
     // Update is called once per frame

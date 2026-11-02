@@ -23,7 +23,7 @@ public class PanelControl : MenuControl
 
     private void OnEnable()
     {
-        //InitialSetup();
+        InitialSetup();
     }
 
     public override void InitialSetup()
@@ -101,27 +101,36 @@ public class PanelControl : MenuControl
     
     
 
-    public void ReceiveRequest(MenuControl targetMenu, DiscreetButtonControl.OpenBehavior openBehavior,
-        DiscreetButtonControl.RequestType requestType)
+    public void ReceiveRequest(MenuControl targetMenu, DiscreetButtonControl sender)
     {
-        switch (requestType)
+        switch (sender.requestType)
         {
             case DiscreetButtonControl.RequestType.Action:
                 // TODO: Receive Request class containing Action. Do what is in the Action class.
-                Debug.Log("Requested action!");
+                //Debug.Log("Requested action!");
+                TurnSystem.instance.RequestPlayerAction(sender.GetAction());
+                ControlManager.instance.SetToAwaitMode();
                 UIManager.instance.FullExit();
                 break;
             case DiscreetButtonControl.RequestType.OpenMenu:
-                if (openBehavior == DiscreetButtonControl.OpenBehavior.Standalone)
+                if (sender.openBehavior == DiscreetButtonControl.OpenBehavior.Standalone)
                 {
                     // TODO: Not done.
                     UIManager.instance.HideAllMenus();
                 }
                 else
                 {
-                    ToggleChildButtons(false);
-                    UIManager.instance.SetCurrentMenu(targetMenu);
-                    targetMenu.gameObject.SetActive(true);
+                    if (targetMenu != null)
+                    {
+                        ToggleChildButtons(false);
+                        UIManager.instance.SetCurrentMenu(targetMenu);
+                        targetMenu.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{sender.gameObject.name} has no target menu!");
+                        UIManager.instance.FullExit();
+                    }
                 }
                 break;
         }

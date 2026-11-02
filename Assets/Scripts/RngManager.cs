@@ -30,9 +30,14 @@ public class RngManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        MapRandom = new Random((uint)System.DateTime.Now.Millisecond);
-        SpawnRandom = new Random((uint)System.DateTime.Now.Millisecond);
-        AIRandom = new Random((uint)System.DateTime.Now.Millisecond);
+        if (MapRandom.state == 0)
+            MapRandom = new Random((uint)System.DateTime.Now.Millisecond);
+        
+        if (SpawnRandom.state == 0)
+            SpawnRandom = new Random((uint)System.DateTime.Now.Millisecond);
+        
+        if (AIRandom.state == 0)
+            AIRandom = new Random((uint)System.DateTime.Now.Millisecond);
         
     }
 }

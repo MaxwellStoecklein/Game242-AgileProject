@@ -18,9 +18,9 @@ public class UITestControls : MonoBehaviour
         testActs.Player.Disable();
         testActs.UI.Enable();
         
-        testActs.UI.Navigate.performed += ctx => uiManager.MoveCursor(ctx.ReadValue<Vector2>());
+        /*testActs.UI.Navigate.performed += ctx => uiManager.MoveCursor(ctx.ReadValue<Vector2>());
         testActs.UI.Submit.performed += ctx => uiManager.SelectElement();
-        testActs.UI.Cancel.performed += ctx => uiManager.Back();
+        testActs.UI.Cancel.performed += ctx => uiManager.Back();*/
     }
 
     // Update is called once per frame

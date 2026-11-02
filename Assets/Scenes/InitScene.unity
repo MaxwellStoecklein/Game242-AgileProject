@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InitSceneLoader
   toLoad:
   - {fileID: 6842128315808561888, guid: 6c38c48d42cb31e5a8d8a2af602f7bda, type: 3}
+  - {fileID: 4961676714287366219, guid: 72aa3cfeeca028ac7a13bb017b39b7b9, type: 3}
 --- !u!4 &1176196777
 Transform:
   m_ObjectHideFlags: 0

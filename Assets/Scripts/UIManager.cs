@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         //currentMenu = Instantiate(panelPrefab, canvas.transform).GetComponent<MenuControl>();
-        MenuSetup(currentMenu);
+        //MenuSetup(currentMenu);
     }
 
     // Update is called once per frame
@@ -79,9 +79,20 @@ public class UIManager : MonoBehaviour
     {
         if (currentMenu != null)
         {
-            currentMenu.Back();
-            currentMenu = menus.Pop();
-            MenuSetup(currentMenu);
+            if (menus.Count > 0)
+            {
+                currentMenu.Back();
+                currentMenu = menus.Pop();
+                MenuSetup(currentMenu);
+            }
+            else
+            {
+                currentMenu.Back();
+                currentMenu = null;
+                cursor.gameObject.SetActive(false);
+                ControlManager.instance.SetToMoveMode();
+                
+            }
         }
     }
 
@@ -94,14 +105,17 @@ public class UIManager : MonoBehaviour
         
         currentMenu.Back();
         currentMenu = null;
+        cursor.gameObject.SetActive(false);
+        ControlManager.instance.SetToMoveMode();
     }
 
     public void OpenMenu()
     {
         if (currentMenu == null)
         {
-            rootMenu.gameObject.SetActive(true);
+            cursor.gameObject.SetActive(true);
             currentMenu = rootMenu;
+            rootMenu.gameObject.SetActive(true);
         }
     }
 

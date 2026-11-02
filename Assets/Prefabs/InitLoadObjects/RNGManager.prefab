@@ -44,3 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccdfdddb2d6db1717b9dad9a2820c603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RngManager
+  MapRandom:
+    state: 0
+  SpawnRandom:
+    state: 0
+  AIRandom:
+    state: 0

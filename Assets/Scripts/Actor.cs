@@ -14,7 +14,7 @@ public abstract class Actor : MonoBehaviour
 
     [SerializeField] protected string statSheet;
 
-    public class Action
+    /*public class Action
     {
         public enum ActionType
         {
@@ -25,7 +25,7 @@ public abstract class Actor : MonoBehaviour
         
         public ActionType actionType;
         public Vector3 destination;
-    }
+    }*/
     
     #region Setters
 

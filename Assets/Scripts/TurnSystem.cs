@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -15,6 +17,8 @@ using Random = Unity.Mathematics.Random;
 
 public class TurnSystem : MonoBehaviour
 {
+    public static TurnSystem instance;
+    
     public InputSystem_Actions actions;
     [SerializeField] private Tilemap tilemap;
 
@@ -31,7 +35,19 @@ public class TurnSystem : MonoBehaviour
 
     private bool listenInputs = false;
     public bool manualMode = true;
-    
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -40,7 +56,7 @@ public class TurnSystem : MonoBehaviour
         InitTurnOrderState();
         actions = new InputSystem_Actions();
         actions.Enable();
-        
+        ControlManager.instance.InitTurnSystem(this);
     }
 
     void InitTurnOrderState()
@@ -160,7 +176,8 @@ public class TurnSystem : MonoBehaviour
         // focus camera on player
         
         // await input response
-        listenInputs = true;
+        //listenInputs = true;
+        ControlManager.instance.SetToMoveMode();
         //Debug.Log("Set listen inputs to true");
     }
 
@@ -185,10 +202,23 @@ public class TurnSystem : MonoBehaviour
         {
             if (currentActor is Player)
             {
-                yield return StartCoroutine(MoveQueueCoroutine());
-                yield return StartCoroutine(ActQueueCoroutine());
-                Debug.Log($"Actor {currentActor.GetName()} executed act! They're a player so they skipped queue.");
                 yield return StartCoroutine(PlayerActCoroutine());
+                Debug.Log($"Actor {currentActor.GetName()} executed act! They're a player so they skipped queue.");
+
+                /*if (moveQueue.Count > 0)
+                {
+                    yield return StartCoroutine(MoveQueueCoroutine());
+                }
+                else
+                {
+                    Debug.Log("Action queue was empty, so it was skipped.");
+                }
+
+                if (actionQueue.Count > 0)
+                {
+                    yield return StartCoroutine(ActQueueCoroutine());
+                    Debug.Log("This should print after act queue exec.");
+                }*/
             }
             else
             {
@@ -319,15 +349,34 @@ public class TurnSystem : MonoBehaviour
         yield return currentActor.Act();
     }
 
+    public void RequestPlayerMove(Vector2 dir)
+    {
+        PlayerMove(new Vector3Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)));
+    }
+
+    public void RequestPlayerStandardAttack()
+    {
+        FlashSkill flashAction = new FlashSkill();
+        StartCoroutine(ExecuteAction(flashAction));
+    }
+
+    public void RequestPlayerAction(IEntityAction action)
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        IEntityAction savedAction = assembly.CreateInstance(action.GetType().Name) as IEntityAction;
+        // TODO: Verify what is causing issues here. Occasional NullRefExecp and entity stays white or halts movement halfway through.
+        StartCoroutine(ExecuteAction(action));
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (listenInputs)
+        /*if (listenInputs)
         {
             /*if (actions.Player.Move.ReadValue<Vector2>().magnitude > 0.1)
             {
                 
-            }*/
+            }#1#
             
             if (actions.Player.Move.inProgress)
             {
@@ -344,6 +393,6 @@ public class TurnSystem : MonoBehaviour
                 
                 StartCoroutine(PlayerActCoroutine());
             }
-        }
+        }*/
     }
 }
