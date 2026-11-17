@@ -18,17 +18,23 @@ public class Enemy : Actor
         {
             case 1:
                 MoveAction moveAction = new MoveAction();
-                
+                bool validMove = false;
                 // Rounding parts to avoid lossy float conversion if the float is marginally below the whole
                 // number we're trying to convert to.
                 // We get the position via CellToWorld to make sure target positions are always
                 // accurate even if the tilemap's settings change.
-                moveAction.destination = GridManager.instance.StageMap.CellToWorld(
-                    new Vector3Int((int)math.round(position.x), (int)math.round(position.y)) + 
-                    new Vector3Int(
-                        RngManager.instance.AIRandom.NextInt(-1, 2),
-                    RngManager.instance.AIRandom.NextInt(-1, 2),
-                    0));
+                while (!validMove)
+                {
+                    moveAction.destination = GridManager.instance.StageMap.CellToWorld(
+                        new Vector3Int((int)math.round(position.x), (int)math.round(position.y)) + 
+                        new Vector3Int(
+                            RngManager.instance.AIRandom.NextInt(-1, 2),
+                            RngManager.instance.AIRandom.NextInt(-1, 2),
+                            0));
+                    validMove = TurnSystem.instance.CheckVacantTile(moveAction);
+                    validMove = TurnSystem.instance.CheckWalkableTile(this, moveAction);
+                }
+                
                 action = moveAction;
                 break;
             case 2:

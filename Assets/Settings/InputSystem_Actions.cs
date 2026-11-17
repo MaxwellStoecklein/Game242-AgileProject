@@ -211,6 +211,26 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""initialStateCheck"": false,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""MoveModifier"",
+                    ""type"": ""Button"",
+                    ""id"": ""052dc538-1f18-4e03-8f33-3bff4bac1a9f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""AimModifier"",
+                    ""type"": ""Button"",
+                    ""id"": ""8d5fa5ff-4d7c-4972-b05c-3bc7f7e89f7c"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -662,6 +682,50 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""88949617-c7eb-44e0-8004-6d40712dc3c8"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f8198a63-ddd6-4ed5-b7e8-70ca46169c24"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MoveModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e9dec9a4-099f-49a3-ab84-74e274c1cc2a"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AimModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b050cc99-870f-45ae-a16d-378dec59cfc1"",
+                    ""path"": ""<Gamepad>/buttonWest"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AimModifier"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -2429,6 +2493,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_mv = m_Player.FindAction("mv", throwIfNotFound: true);
         m_Player_Back = m_Player.FindAction("Back", throwIfNotFound: true);
         m_Player_Menu = m_Player.FindAction("Menu", throwIfNotFound: true);
+        m_Player_MoveModifier = m_Player.FindAction("MoveModifier", throwIfNotFound: true);
+        m_Player_AimModifier = m_Player.FindAction("AimModifier", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Move = m_UI.FindAction("Move", throwIfNotFound: true);
@@ -2564,6 +2630,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_mv;
     private readonly InputAction m_Player_Back;
     private readonly InputAction m_Player_Menu;
+    private readonly InputAction m_Player_MoveModifier;
+    private readonly InputAction m_Player_AimModifier;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -2623,6 +2691,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Menu".
         /// </summary>
         public InputAction @Menu => m_Wrapper.m_Player_Menu;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MoveModifier".
+        /// </summary>
+        public InputAction @MoveModifier => m_Wrapper.m_Player_MoveModifier;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/AimModifier".
+        /// </summary>
+        public InputAction @AimModifier => m_Wrapper.m_Player_AimModifier;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -2685,6 +2761,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Menu.started += instance.OnMenu;
             @Menu.performed += instance.OnMenu;
             @Menu.canceled += instance.OnMenu;
+            @MoveModifier.started += instance.OnMoveModifier;
+            @MoveModifier.performed += instance.OnMoveModifier;
+            @MoveModifier.canceled += instance.OnMoveModifier;
+            @AimModifier.started += instance.OnAimModifier;
+            @AimModifier.performed += instance.OnAimModifier;
+            @AimModifier.canceled += instance.OnAimModifier;
         }
 
         /// <summary>
@@ -2732,6 +2814,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Menu.started -= instance.OnMenu;
             @Menu.performed -= instance.OnMenu;
             @Menu.canceled -= instance.OnMenu;
+            @MoveModifier.started -= instance.OnMoveModifier;
+            @MoveModifier.performed -= instance.OnMoveModifier;
+            @MoveModifier.canceled -= instance.OnMoveModifier;
+            @AimModifier.started -= instance.OnAimModifier;
+            @AimModifier.performed -= instance.OnAimModifier;
+            @AimModifier.canceled -= instance.OnAimModifier;
         }
 
         /// <summary>
@@ -3550,6 +3638,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MoveModifier" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMoveModifier(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AimModifier" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAimModifier(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

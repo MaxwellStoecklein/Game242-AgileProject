@@ -41,6 +41,17 @@ public class ControlManager : MonoBehaviour
         PlayerControls.Player.Menu.performed += OpenMenu;
         PlayerControls.Player.Move.performed += MovePlayer;
         PlayerControls.Player.Attack.performed += StandardAttack;
+        
+        /*
+         * TODO: Potentially refactor these functions to be part of the update method
+         * in order to ensure the game never misses an input. I fear that poorly timed frame stutters
+         * may cause it to miss a started/canceled signal.
+         */
+        PlayerControls.Player.MoveModifier.started += MoveModifierOn;
+        PlayerControls.Player.MoveModifier.canceled += MoveModifierOff;
+        PlayerControls.Player.AimModifier.started += AimModifierOn;
+        PlayerControls.Player.AimModifier.canceled += AimModifierOff;
+        
 
         /*PlayerControls.ErrorChecker.Move.performed += ctx => NoControlEnabled();
         PlayerControls.ErrorChecker.Attack.performed += ctx => NoControlEnabled();
@@ -83,15 +94,47 @@ public class ControlManager : MonoBehaviour
     
     void MovePlayer(InputAction.CallbackContext input)
     {
+        if (PlayerControls.Player.MoveModifier.inProgress)
+        {
+            if (/*PlayerControls.Player.Move.*/true)
+            {
+                
+            }
+        }
+        
         turnSystem.RequestPlayerMove(input.ReadValue<Vector2>());
         Debug.Log($"Requested move with input: {input.ReadValue<Vector2>()}");
-        SetToAwaitMode();
+    }
+
+    void CheckDiagonalInput(InputAction.CallbackContext input)
+    {
+        
     }
 
     void StandardAttack(InputAction.CallbackContext input)
     {
         turnSystem.RequestPlayerStandardAttack();
         SetToAwaitMode();
+    }
+
+    void MoveModifierOn(InputAction.CallbackContext input)
+    {
+        
+    }
+
+    void MoveModifierOff(InputAction.CallbackContext input)
+    {
+        
+    }
+
+    void AimModifierOn(InputAction.CallbackContext input)
+    {
+        
+    }
+
+    void AimModifierOff(InputAction.CallbackContext input)
+    {
+        
     }
 
     void MenuNav(InputAction.CallbackContext input)
@@ -131,53 +174,5 @@ public class ControlManager : MonoBehaviour
         }
     }
     
-    /*
-     * left: x > -30 && x <= 30
-       up left: x > 30 && x <= 60
-       up: x > 60 && x <= 120
-       up right: x > 120 && x <= 150
-       right: x > 150 && x <= -150
-       down right: x > -150 && x <= -120
-       down: x > -120 && x <= -60
-       down left: x > -60 && x <= -30
-     */
-    void DirectionInput(InputAction.CallbackContext input)
-    {
-        Vector2 dir = input.ReadValue<Vector2>();
-        dir.Normalize();
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
-        if (angle > -30f && angle <= 30f)
-        {
-            Debug.Log("Left");
-        }
-        if (angle > 30f && angle <= 60f)
-        {
-            Debug.Log("Up Left");
-        }
-        if (angle > 60f && angle <= 120f)
-        {
-            Debug.Log("Up");
-        }
-        if (angle > 120f && angle <= 150f)
-        {
-            Debug.Log("Up Right");
-        }
-        if (angle > 150f || angle <= -150f)
-        {
-            Debug.Log("Right");
-        }
-        if (angle > -150f && angle <= -120f)
-        {
-            Debug.Log("Down Right");
-        }
-        if (angle > -120f && angle <= -60f)
-        {
-            Debug.Log("Down");
-        }
-        if (angle > -60f && angle <= -30f)
-        {
-            Debug.Log("Down Left");
-        }
-    }
+    
 }

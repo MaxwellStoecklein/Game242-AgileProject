@@ -9,6 +9,7 @@ public abstract class Actor : MonoBehaviour
     [SerializeField] protected int health;
     [SerializeField] protected int maxHealth;
     [SerializeField] protected Vector3 position;
+    [SerializeField] protected Vector2 rotation;
     [SerializeField] protected GameObject selectionPointer;
     [SerializeField] protected bool isLeader;
 
@@ -67,6 +68,7 @@ public abstract class Actor : MonoBehaviour
         maxHealth = newMaxHealth;
         health = newMaxHealth;
         isLeader = false;
+        rotation = Vector2.down;
     }
 
     public Actor()
@@ -75,6 +77,7 @@ public abstract class Actor : MonoBehaviour
         maxHealth = 10;
         health = maxHealth;
         isLeader = false;
+        rotation = Vector2.down;
     }
 
     /*public IEnumerator Move(Vector3Int direction)

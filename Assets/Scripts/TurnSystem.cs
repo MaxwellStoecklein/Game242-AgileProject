@@ -351,7 +351,18 @@ public class TurnSystem : MonoBehaviour
 
     public void RequestPlayerMove(Vector2 dir)
     {
-        PlayerMove(new Vector3Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)));
+        Vector3Int dirInt = new Vector3Int((int)dir.x, (int)dir.y, 0);
+        MoveAction temp = new MoveAction();
+        temp.destination = GridManager.instance.StageMap.CellToWorld(
+            new Vector3Int((int)math.round(currentActor.GetPosition().x),
+                (int)math.round(currentActor.GetPosition().y)) +
+            dirInt);
+        
+        if (CheckWalkableTile(currentActor, temp) && CheckVacantTile(temp))
+        {
+            PlayerMove(new Vector3Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)));
+            ControlManager.instance.SetToAwaitMode();
+        }
     }
 
     public void RequestPlayerStandardAttack()
@@ -365,9 +376,61 @@ public class TurnSystem : MonoBehaviour
         Assembly assembly = Assembly.GetExecutingAssembly();
         IEntityAction savedAction = assembly.CreateInstance(action.GetType().Name) as IEntityAction;
         // TODO: Verify what is causing issues here. Occasional NullRefExecp and entity stays white or halts movement halfway through.
+        // Note: unsure this is even the cause now.
         StartCoroutine(ExecuteAction(action));
     }
 
+    public bool CheckVacantTile(MoveAction moveAction)
+    {
+        // Currently just checks if a tile is either occupied or will be occupied.
+        /* TODO: Allow movement on an occupied tile if we know the tile will empty before our turn in the queue.
+                 e.g: An entity is on that tile, but decided to move elsewhere (and their movement is confirmed to be valid.
+                 What can go wrong:
+                    - The entity we expect to leave the tile is stopped from moving by an action, debuff, etc.
+                    - 
+        */
+        
+        
+        bool vacant = true;
+        
+        foreach (var actor in actors)
+        {
+            if (tilemap.WorldToCell(actor.GetPosition()) == moveAction.destination)
+            {
+                vacant = false;
+            }
+        }
+
+        if (!vacant)
+        {
+            foreach (var queuedTile in moveQueue)
+            {
+                if (tilemap.WorldToCell(queuedTile.Value.destination) == moveAction.destination)
+                {
+                    vacant = false;
+                }
+            }
+        }
+        
+        return vacant;
+    }
+
+    public bool CheckWalkableTile(Actor actor, MoveAction moveAction)
+    {
+        bool walkable = true;
+
+        ExtendedTile tile = tilemap.GetTile(tilemap.WorldToCell(moveAction.destination)) as ExtendedTile;
+        
+        if (tile != null)
+        {
+            if (tile.tileType == ExtendedTile.TileType.Wall)
+            {
+                walkable = false;
+            }
+        }
+
+        return walkable;
+    }
     // Update is called once per frame
     void Update()
     {
