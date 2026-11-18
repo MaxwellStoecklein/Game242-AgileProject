@@ -1,5 +1,7 @@
+using System;
 using System.Reflection;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -35,11 +37,16 @@ public class DiscreetButtonControl: MonoBehaviour
             Debug.Log("Ready");
             tmp.ChildReady();
         }
-        ParseAction();
+        //ParseAction();
 
     }
 
-    void ParseAction()
+    /*private void OnEnable()
+    {
+        ParseAction();
+    }*/
+
+    public void ParseAction()
     {
         if (!string.IsNullOrEmpty(actionName))
         {
@@ -48,10 +55,12 @@ public class DiscreetButtonControl: MonoBehaviour
             if (parsedAction != null)
             {
                 Debug.LogWarning($"{gameObject.name} contains action: {parsedAction.GetType()}");
+                GetComponentInChildren<TMP_Text>().text = parsedAction.GetName();
             }
             else
             {
                 Debug.LogWarning($"{gameObject.name} failed to parse action: {actionName}");
+                GetComponentInChildren<TMP_Text>().text = "---";
             }
         }
     }

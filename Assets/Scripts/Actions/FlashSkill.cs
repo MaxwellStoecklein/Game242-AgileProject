@@ -3,6 +3,11 @@ using UnityEngine;
 
 public class FlashSkill : SkillAction
 {
+    public override string GetName()
+    {
+        return "Flash";
+    }
+
     public override IEnumerator ActionCoroutine(Actor myActor)
     {
         Color temp = myActor.GetComponentInChildren<SpriteRenderer>().color;

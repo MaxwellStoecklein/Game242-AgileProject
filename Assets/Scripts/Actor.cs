@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 public abstract class Actor : MonoBehaviour
@@ -8,12 +10,19 @@ public abstract class Actor : MonoBehaviour
     [SerializeField] protected string unitName;
     [SerializeField] protected int health;
     [SerializeField] protected int maxHealth;
+    [SerializeField] protected int attack;
+    [SerializeField] protected int defense;
+    [SerializeField] protected int magicAttack;
+    [SerializeField] protected int magicDefense;
+
+    [SerializeField] protected List<string> actions;
+    
     [SerializeField] protected Vector3 position;
     [SerializeField] protected Vector2 facingRotation;
     [SerializeField] protected GameObject selectionPointer;
     [SerializeField] protected bool isLeader;
 
-    [SerializeField] protected string statSheet;
+    [SerializeField] protected StatSheet statSheet;
 
     /*public class Action
     {
@@ -58,11 +67,23 @@ public abstract class Actor : MonoBehaviour
     public int GetHealth() => health;
     public int GetMaxHealth() => maxHealth;
     public Vector3 GetPosition() => position;
+    /// <summary>
+    /// Returns the player's rotation based on the last rotating input.
+    /// </summary>
+    /// <remarks>WARNING: This does NOT account for tilemap positions. Diagonals WILL return stuff like 0.71... and so on.
+    /// MAKE SURE TO CORRECT THE RETURN VALUE TO PROPER INTEGERS WHEN APPLICABLE.</remarks>
+    public Vector2 GetFacingRotation() => facingRotation;
     public bool IsLeader() => isLeader;
+    public StatSheet GetStatSheet() => statSheet;
+    public int GetAttack() => attack;
+    public int GetDefense() => defense;
+    public int GetMagicAttack => magicAttack;
+    public int GetMagicDefense => magicDefense;
+    public List<string> GetActions() => actions;
     
     #endregion
     
-    public Actor(string newName, int newMaxHealth)
+    /*public Actor(string newName, int newMaxHealth)
     {
         name = newName;
         maxHealth = newMaxHealth;
@@ -78,7 +99,7 @@ public abstract class Actor : MonoBehaviour
         health = maxHealth;
         isLeader = false;
         facingRotation = Vector2.down;
-    }
+    }*/
 
     /*public IEnumerator Move(Vector3Int direction)
     {
@@ -95,6 +116,23 @@ public abstract class Actor : MonoBehaviour
         transform.position = newPos;
         position += direction;
     }*/
+
+    public void InitStats()
+    {
+        unitName = statSheet.entityName;
+        health = statSheet.maxHealth;
+        maxHealth = statSheet.maxHealth;
+        attack = statSheet.attack;
+        defense = statSheet.defense;
+        magicAttack = statSheet.magicAttack;
+        magicDefense = statSheet.magicDefense;
+        actions = new List<string>(statSheet.actions);
+    }
+
+    public void Hit(int damage)
+    {
+        health -= damage - defense / 2;
+    }
 
     public void Rotate(Vector2 rotDir)
     {

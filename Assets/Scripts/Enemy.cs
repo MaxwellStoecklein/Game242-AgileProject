@@ -5,10 +5,6 @@ using UnityEngine;
 public class Enemy : Actor
 {
     private bool queueAction = false;
-    
-    public Enemy(string newName, int newMaxHealth) : base(newName, newMaxHealth)
-    {
-    }
 
     public IEntityAction ChooseAction()
     {
@@ -23,19 +19,33 @@ public class Enemy : Actor
                 // number we're trying to convert to.
                 // We get the position via CellToWorld to make sure target positions are always
                 // accurate even if the tilemap's settings change.
-                while (!validMove)
+                int failcount = -1;
+                while (!validMove && failcount < 10)
                 {
+                    failcount++;
                     moveAction.destination = GridManager.instance.StageMap.CellToWorld(
                         new Vector3Int((int)math.round(position.x), (int)math.round(position.y)) + 
                         new Vector3Int(
                             RngManager.instance.AIRandom.NextInt(-1, 2),
                             RngManager.instance.AIRandom.NextInt(-1, 2),
                             0));
-                    validMove = TurnSystem.instance.CheckVacantTile(moveAction);
                     validMove = TurnSystem.instance.CheckWalkableTile(this, moveAction);
+                    validMove = TurnSystem.instance.CheckVacantTile(moveAction);
+                }
+
+                if (failcount >= 10)
+                {
+                    Debug.Log($"{this.name} couldn't move...");
+                    MoveAction idle = new MoveAction();
+                    idle.destination = GridManager.instance.StageMap.CellToWorld(
+                        new Vector3Int((int)math.round(position.x), (int)math.round(position.y)));
+                    action = idle;
+                }
+                else
+                {
+                    action = moveAction;
                 }
                 
-                action = moveAction;
                 break;
             case 2:
                 FlashSkill flashSkill = new FlashSkill();

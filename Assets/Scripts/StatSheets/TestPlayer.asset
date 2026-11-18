@@ -19,3 +19,6 @@ MonoBehaviour:
   defense: 5
   magicAttack: 5
   magicDefense: 5
+  actions:
+  - CutSkill
+  - Bash

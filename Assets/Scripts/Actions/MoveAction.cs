@@ -3,8 +3,13 @@ using UnityEngine;
 
 public class MoveAction : IEntityAction
 {
-    public Vector3 destination;
+    public string GetName()
+    {
+        return GetType().Name;
+    }
     
+    public Vector3 destination;
+
     public IEnumerator ActionCoroutine(Actor myActor)
     {
         // Movement logic has to be handled elsewhere so this function goes unused for MoveActions.

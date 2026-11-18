@@ -28,9 +28,27 @@ public class ActionListController : MonoBehaviour
         {
             InitializeElement(ctrl);
         }
+
+
+        List<string> currentActions = TurnSystem.instance.GetCurrentActor().GetActions();
+        int index = 0;
+
+        foreach (string actionName in currentActions)
+        {
+            if (index < elements.Count)
+            {
+                elements[index].actionName = actionName;
+                elements[index].ParseAction();
+                index++;
+            }
+        }
+
+        for (; index < elements.Count; index++)
+        {
+            elements[index].GetComponentInChildren<TMP_Text>().text = "---";
+        }
         
-        
-        // This section is a placeholder to generate hardcoded actions since we have no stats yet
+        /*// This section is a placeholder to generate hardcoded actions since we have no stats yet
         DiscreetButtonControl btn;
         
         elements[0].GetComponentInChildren<TMP_Text>().text = "Cut (Functional)";
@@ -50,7 +68,7 @@ public class ActionListController : MonoBehaviour
         {
             
 
-        }
+        }*/
     }
 
     IEnumerator WaitForChildrenReady()

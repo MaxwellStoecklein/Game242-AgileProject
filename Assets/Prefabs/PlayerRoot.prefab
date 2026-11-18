@@ -137,6 +137,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98ef9a942c13298b6b0b2d912a1b65a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  name: 
+  unitName: 
   health: 0
   maxHealth: 0
+  position: {x: 0, y: 0, z: 0}
+  facingRotation: {x: 0, y: 0}
+  selectionPointer: {fileID: 0}
+  isLeader: 0
+  statSheet: {fileID: 11400000, guid: 31d0e08b6d4b4d5a4b9f3ca5cb3993b2, type: 2}

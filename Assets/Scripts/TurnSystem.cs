@@ -108,6 +108,8 @@ public class TurnSystem : MonoBehaviour
 
             entity.SetPosition(new Vector3Int(newPos.x, newPos.y, 0));
             entity.transform.position = new Vector3(newPos.x, newPos.y, 0);
+            entity.InitStats();
+            entity.Rotate(Vector2.down);
         }
             
             
@@ -202,7 +204,8 @@ public class TurnSystem : MonoBehaviour
         {
             if (currentActor is Player)
             {
-                yield return StartCoroutine(PlayerActCoroutine());
+                //yield return StartCoroutine(PlayerActCoroutine());
+                yield return StartCoroutine(action.ActionCoroutine(currentActor));
                 Debug.Log($"Actor {currentActor.GetName()} executed act! They're a player so they skipped queue.");
 
                 /*if (moveQueue.Count > 0)
@@ -374,7 +377,7 @@ public class TurnSystem : MonoBehaviour
             ControlManager.instance.SetToAwaitMode();
         }
     }
-
+    
     public void RequestPlayerRotate(Vector2 dir)
     {
         currentActor.Rotate(dir);
@@ -410,13 +413,15 @@ public class TurnSystem : MonoBehaviour
         
         foreach (var actor in actors)
         {
+            //Debug.Log($"Comparing pos {tilemap.WorldToCell(actor.GetPosition())} to {moveAction.destination}");
             if (tilemap.WorldToCell(actor.GetPosition()) == moveAction.destination)
             {
+                //Debug.Log($"{actor.name}'s destination is NOT VACANT");
                 vacant = false;
             }
         }
 
-        if (!vacant)
+        if (vacant)
         {
             foreach (var queuedTile in moveQueue)
             {
@@ -428,6 +433,19 @@ public class TurnSystem : MonoBehaviour
         }
         
         return vacant;
+    }
+
+    public Actor GetActorAtTile(Vector3Int position)
+    {
+        foreach (var actor in actors)
+        {
+            if (tilemap.WorldToCell(actor.GetPosition()) == position)
+            {
+                return actor;
+            }
+        }
+
+        return null;
     }
 
     public bool CheckWalkableTile(Actor actor, MoveAction moveAction)
@@ -445,6 +463,16 @@ public class TurnSystem : MonoBehaviour
         }
 
         return walkable;
+    }
+
+    public Actor GetCurrentActor()
+    {
+        return currentActor;
+    }
+
+    public Tilemap GetTilemap()
+    {
+        return tilemap;
     }
     // Update is called once per frame
     void Update()

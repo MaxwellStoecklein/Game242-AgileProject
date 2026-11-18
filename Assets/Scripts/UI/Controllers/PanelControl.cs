@@ -108,9 +108,12 @@ public class PanelControl : MenuControl
             case DiscreetButtonControl.RequestType.Action:
                 // TODO: Receive Request class containing Action. Do what is in the Action class.
                 //Debug.Log("Requested action!");
-                TurnSystem.instance.RequestPlayerAction(sender.GetAction());
-                ControlManager.instance.SetToAwaitMode();
-                UIManager.instance.FullExit(false);
+                if (sender.GetAction() != null)
+                {
+                    TurnSystem.instance.RequestPlayerAction(sender.GetAction());
+                    ControlManager.instance.SetToAwaitMode();
+                    UIManager.instance.FullExit(false);
+                }
                 break;
             case DiscreetButtonControl.RequestType.OpenMenu:
                 if (sender.openBehavior == DiscreetButtonControl.OpenBehavior.Standalone)

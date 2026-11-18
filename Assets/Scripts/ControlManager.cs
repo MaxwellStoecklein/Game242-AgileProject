@@ -38,14 +38,19 @@ public class ControlManager : MonoBehaviour
 
         #region Link_Control_Functions
 
+        // NOTE: The order these are listed in is important. Attaching Select to Attack.performed
+        // before attaching StandardAttack to Attack.performed will cause the player to instantly use a
+        // standard attack when trying to exit the main menu by selecting the "Back" option as opposed to
+        // pressing the Back or OpenMenu inputs to close it.
+        
+        PlayerControls.Player.Move.performed += MovePlayer;
+        PlayerControls.Player.Move.canceled += DiagonalAimFilter;
+        PlayerControls.Player.Attack.performed += StandardAttack;
+        
         PlayerControls.Player.Move.performed += MenuNav;
         PlayerControls.Player.Attack.performed += Select;
         PlayerControls.Player.Back.performed += Back;
         PlayerControls.Player.Menu.performed += OpenMenu;
-
-        PlayerControls.Player.Move.performed += MovePlayer;
-        PlayerControls.Player.Move.canceled += DiagonalAimFilter;
-        PlayerControls.Player.Attack.performed += StandardAttack;
         
         /*
          * TODO: Potentially refactor these functions to be part of the update method
