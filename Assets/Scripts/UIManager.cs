@@ -96,7 +96,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void FullExit()
+    public void FullExit(bool moveable)
     {
         while (menus.Count > 0)
         {
@@ -106,7 +106,11 @@ public class UIManager : MonoBehaviour
         currentMenu.Back();
         currentMenu = null;
         cursor.gameObject.SetActive(false);
-        ControlManager.instance.SetToMoveMode();
+
+        if (moveable)
+        {
+            ControlManager.instance.SetToMoveMode();
+        }
     }
 
     public void OpenMenu()

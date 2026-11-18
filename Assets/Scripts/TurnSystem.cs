@@ -351,7 +351,17 @@ public class TurnSystem : MonoBehaviour
 
     public void RequestPlayerMove(Vector2 dir)
     {
-        Vector3Int dirInt = new Vector3Int((int)dir.x, (int)dir.y, 0);
+        Vector3Int dirInt = new Vector3Int(0, 0, 0);
+
+        if (dir.x > 0)
+            dirInt.x = 1;
+        else if (dir.x < 0)
+            dirInt.x = -1;
+        if (dir.y > 0)
+            dirInt.y = 1;
+        else if (dir.y < 0)
+            dirInt.y = -1;
+        
         MoveAction temp = new MoveAction();
         temp.destination = GridManager.instance.StageMap.CellToWorld(
             new Vector3Int((int)math.round(currentActor.GetPosition().x),
@@ -363,6 +373,11 @@ public class TurnSystem : MonoBehaviour
             PlayerMove(new Vector3Int(Mathf.RoundToInt(dir.x), Mathf.RoundToInt(dir.y)));
             ControlManager.instance.SetToAwaitMode();
         }
+    }
+
+    public void RequestPlayerRotate(Vector2 dir)
+    {
+        currentActor.Rotate(dir);
     }
 
     public void RequestPlayerStandardAttack()

@@ -9,7 +9,7 @@ public abstract class Actor : MonoBehaviour
     [SerializeField] protected int health;
     [SerializeField] protected int maxHealth;
     [SerializeField] protected Vector3 position;
-    [SerializeField] protected Vector2 rotation;
+    [SerializeField] protected Vector2 facingRotation;
     [SerializeField] protected GameObject selectionPointer;
     [SerializeField] protected bool isLeader;
 
@@ -68,7 +68,7 @@ public abstract class Actor : MonoBehaviour
         maxHealth = newMaxHealth;
         health = newMaxHealth;
         isLeader = false;
-        rotation = Vector2.down;
+        facingRotation = Vector2.down;
     }
 
     public Actor()
@@ -77,7 +77,7 @@ public abstract class Actor : MonoBehaviour
         maxHealth = 10;
         health = maxHealth;
         isLeader = false;
-        rotation = Vector2.down;
+        facingRotation = Vector2.down;
     }
 
     /*public IEnumerator Move(Vector3Int direction)
@@ -95,8 +95,13 @@ public abstract class Actor : MonoBehaviour
         transform.position = newPos;
         position += direction;
     }*/
-    
-    
+
+    public void Rotate(Vector2 rotDir)
+    {
+        facingRotation = rotDir;
+        
+        // TODO: Change sprite to new rotation.
+    }
 
     public void MoveTick(float timer, float duration, Vector3 destination)
     {

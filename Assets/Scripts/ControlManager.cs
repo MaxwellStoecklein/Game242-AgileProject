@@ -8,7 +8,12 @@ public class ControlManager : MonoBehaviour
     
     public InputSystem_Actions PlayerControls;
 
-    private bool awaitState = false;
+    private bool moveMode = false;
+    private bool uiMode = false;
+
+    private float timeFromLastRot = 0f;
+    private Vector2 lastMoveDir = Vector2.zero;
+    private Vector2 lastDiagonalMoveDir = Vector2.zero;
 
     [SerializeField] private TurnSystem turnSystem;
 
@@ -33,13 +38,13 @@ public class ControlManager : MonoBehaviour
 
         #region Link_Control_Functions
 
-        PlayerControls.UI.Move.performed += MenuNav;
-        PlayerControls.UI.Attack.performed += Select;
-        PlayerControls.UI.Back.performed += Back;
-        PlayerControls.UI.Menu.performed += OpenMenu;
-
+        PlayerControls.Player.Move.performed += MenuNav;
+        PlayerControls.Player.Attack.performed += Select;
+        PlayerControls.Player.Back.performed += Back;
         PlayerControls.Player.Menu.performed += OpenMenu;
+
         PlayerControls.Player.Move.performed += MovePlayer;
+        PlayerControls.Player.Move.canceled += DiagonalAimFilter;
         PlayerControls.Player.Attack.performed += StandardAttack;
         
         /*
@@ -61,6 +66,10 @@ public class ControlManager : MonoBehaviour
         #endregion
         
         // Player should start with world controls mode by default.
+        moveMode = true;
+        uiMode = false;
+        
+        // TODO: Remove UI control mode. Caused issues reading inputs.
         PlayerControls.UI.Disable();
         
         // ErrorChecker should ALWAYS be enabled. This alerts when no valid control mode is enabled, which should
@@ -71,20 +80,29 @@ public class ControlManager : MonoBehaviour
 
     public void SetToMoveMode()
     {
-        PlayerControls.UI.Disable();
-        PlayerControls.Player.Enable();
+        moveMode = true;
+        uiMode = false;
+        Debug.Log("SetMode: Move");
+        /*PlayerControls.UI.Disable();
+        PlayerControls.Player.Enable();*/
     }
 
     public void SetToMenuMode()
     {
-        PlayerControls.UI.Enable();
-        PlayerControls.Player.Disable();
+        uiMode = true;
+        moveMode = false;
+        Debug.Log("SetMode: UI");
+        /*PlayerControls.UI.Enable();
+        PlayerControls.Player.Disable();*/
     }
 
     public void SetToAwaitMode()
     {
-        PlayerControls.UI.Disable();
-        PlayerControls.Player.Disable();
+        moveMode = false;
+        uiMode = false;
+        Debug.Log("SetMode: Await");
+        /*PlayerControls.UI.Disable();
+        PlayerControls.Player.Disable();*/
     }
 
     public void InitTurnSystem(TurnSystem ts)
@@ -94,29 +112,78 @@ public class ControlManager : MonoBehaviour
     
     void MovePlayer(InputAction.CallbackContext input)
     {
-        if (PlayerControls.Player.MoveModifier.inProgress)
+        if (moveMode)
         {
-            if (/*PlayerControls.Player.Move.*/true)
+            Vector2 dir = input.ReadValue<Vector2>();
+            if (PlayerControls.Player.MoveModifier.inProgress)
             {
-                
+                if (CheckDiagonalInput(dir))
+                {
+                    turnSystem.RequestPlayerMove(dir);
+                    Debug.Log($"Requested DIAGONAL move with input: {input.ReadValue<Vector2>()}");
+                }
             }
+            else if (PlayerControls.Player.AimModifier.inProgress)
+            {
+                if (CheckDiagonalInput(dir))
+                {
+                    turnSystem.RequestPlayerRotate(dir);
+                    timeFromLastRot = Time.time;
+                }
+                else if (CheckDiagonalInput(lastMoveDir))
+                {
+                    turnSystem.RequestPlayerRotate(dir);
+                    lastDiagonalMoveDir = lastMoveDir;
+                    timeFromLastRot = Time.time;
+                }
+                else
+                {
+                    turnSystem.RequestPlayerRotate(dir);
+                }
+            }
+            else
+            {
+                turnSystem.RequestPlayerMove(dir);
+                Debug.Log($"Requested move with input: {input.ReadValue<Vector2>()}");
+            }
+            lastMoveDir = dir;
         }
-        
-        turnSystem.RequestPlayerMove(input.ReadValue<Vector2>());
-        Debug.Log($"Requested move with input: {input.ReadValue<Vector2>()}");
     }
 
-    void CheckDiagonalInput(InputAction.CallbackContext input)
+    bool CheckDiagonalInput(Vector2 dir)
     {
-        
+        float angle = Vector2.Angle(Vector2.right, dir);
+
+        if (
+            (angle > 30f && angle <= 60f) ||
+            (angle > 120f && angle <= 150f) ||
+            (angle > -150f && angle <= -120f) ||
+            (angle > -60f && angle <= -30f)
+            )
+        {
+            return true;
+        }
+        return false;
     }
 
     void StandardAttack(InputAction.CallbackContext input)
     {
-        turnSystem.RequestPlayerStandardAttack();
-        SetToAwaitMode();
+        if (moveMode)
+        {
+            Debug.Log("Used standard attack");
+            turnSystem.RequestPlayerStandardAttack();
+            SetToAwaitMode();
+        }
     }
 
+    void DiagonalAimFilter(InputAction.CallbackContext input)
+    {
+        if (Time.time - timeFromLastRot < 0.025f)
+        {
+            turnSystem.RequestPlayerRotate(lastDiagonalMoveDir);
+        }
+    }
+    
     void MoveModifierOn(InputAction.CallbackContext input)
     {
         
@@ -139,27 +206,36 @@ public class ControlManager : MonoBehaviour
 
     void MenuNav(InputAction.CallbackContext input)
     {
-        UIManager.instance.MoveCursor(input.ReadValue<Vector2>());
+        if (uiMode)
+        {
+            UIManager.instance.MoveCursor(input.ReadValue<Vector2>());
+        }
     }
 
     void Select(InputAction.CallbackContext input)
     {
-        UIManager.instance.SelectElement();
+        if (uiMode)
+        {
+            UIManager.instance.SelectElement();
+        }
     }
 
     void Back(InputAction.CallbackContext input)
     {
-        UIManager.instance.Back();
+        if (uiMode)
+        {
+            UIManager.instance.Back();
+        }
     }
 
     void OpenMenu(InputAction.CallbackContext input)
     {
-        if (PlayerControls.UI.enabled)
+        if (uiMode)
         {
-            UIManager.instance.FullExit();
+            UIManager.instance.FullExit(true);
             SetToMoveMode();
         }
-        else if (PlayerControls.Player.enabled)
+        else if (moveMode)
         {
             UIManager.instance.OpenMenu();
             SetToMenuMode();
@@ -174,5 +250,38 @@ public class ControlManager : MonoBehaviour
         }
     }
     
-    
+    /*
+     * if (angle > -30f && angle <= 30f)
+       {
+           Debug.Log("Left");
+       }
+       if (angle > 30f && angle <= 60f)
+       {
+           Debug.Log("Up Left");
+       }
+       if (angle > 60f && angle <= 120f)
+       {
+           Debug.Log("Up");
+       }
+       if (angle > 120f && angle <= 150f)
+       {
+           Debug.Log("Up Right");
+       }
+       if (angle > 150f || angle <= -150f)
+       {
+           Debug.Log("Right");
+       }
+       if (angle > -150f && angle <= -120f)
+       {
+           Debug.Log("Down Right");
+       }
+       if (angle > -120f && angle <= -60f)
+       {
+           Debug.Log("Down");
+       }
+       if (angle > -60f && angle <= -30f)
+       {
+           Debug.Log("Down Left");
+       
+     */
 }

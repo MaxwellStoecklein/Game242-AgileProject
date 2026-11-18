@@ -110,7 +110,7 @@ public class PanelControl : MenuControl
                 //Debug.Log("Requested action!");
                 TurnSystem.instance.RequestPlayerAction(sender.GetAction());
                 ControlManager.instance.SetToAwaitMode();
-                UIManager.instance.FullExit();
+                UIManager.instance.FullExit(false);
                 break;
             case DiscreetButtonControl.RequestType.OpenMenu:
                 if (sender.openBehavior == DiscreetButtonControl.OpenBehavior.Standalone)
@@ -129,7 +129,7 @@ public class PanelControl : MenuControl
                     else
                     {
                         Debug.LogWarning($"{sender.gameObject.name} has no target menu!");
-                        UIManager.instance.FullExit();
+                        UIManager.instance.FullExit(true);
                     }
                 }
                 break;

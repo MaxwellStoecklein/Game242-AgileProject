@@ -14,6 +14,6 @@ public class DebugInputDisplay : MonoBehaviour
     void Update()
     {
         Vector2 vect = ControlManager.instance.PlayerControls.Player.Move.ReadValue<Vector2>();
-        text.text = $"Input: < {vect.x} , {vect.y} >";
+        text.text = $"Input: < {vect.x} , {vect.y}\nAngle: {Vector2.SignedAngle(Vector2.right, vect)}>";
     }
 }
