@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +14,7 @@ public class UIManager : MonoBehaviour
     public GameObject panelPrefab;
     public GameObject textPrefab;
     public GameObject discreetButtonPrefab;
+    public GameObject damageTextPrefab;
     
     public Stack<MenuControl> menus = new Stack<MenuControl>();
     public MenuControl currentMenu;
@@ -132,5 +135,32 @@ public class UIManager : MonoBehaviour
     {
         menus.Push(currentMenu);
         currentMenu = menu;
+    }
+
+    public void RequestDamageNumberUI(GameObject victim, int damage)
+    {
+        StartCoroutine(DamageNumberAnimation(victim, damage));
+    }
+
+    private IEnumerator DamageNumberAnimation(GameObject victim, int damage)
+    {
+        GameObject damageText = Instantiate(damageTextPrefab);
+        damageText.transform.SetParent(canvas.transform);
+        damageText.transform.position = Camera.main.WorldToScreenPoint(victim.transform.position);
+        damageText.GetComponentInChildren<TMP_Text>().text = $"{-damage}";
+
+        Vector3 textOrigin = damageText.transform.position;
+        Vector3 textDestination = new Vector3(textOrigin.x, textOrigin.y + 100f, textOrigin.z);
+        
+        float timer = 0f;
+        float endTime = 1f;
+
+        while (timer < endTime)
+        {
+            damageText.transform.position = Vector3.Lerp(textOrigin, textDestination, timer * (1f / endTime));
+            timer += Time.deltaTime;
+            yield return null;
+        }
+        Destroy(damageText);
     }
 }

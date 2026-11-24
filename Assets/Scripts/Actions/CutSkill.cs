@@ -11,14 +11,6 @@ public class CutSkill : SkillAction
 
     public override IEnumerator ActionCoroutine(Actor myActor)
     {
-        // Execute animation
-        
-        /*
-         * while (animation signal not triggered)
-         * {
-         *      yield return null;
-         * }
-         */
         
         Vector3 dir = myActor.GetFacingRotation();
         Vector3Int dirInt = new Vector3Int(0, 0, 0);
@@ -31,6 +23,62 @@ public class CutSkill : SkillAction
         else if (dir.y < 0)
             dirInt.y = -1;
 
+        #region Animation
+
+        // Execute animation
+        Transform[] oldPos = myActor.GetComponentsInChildren<Transform>();
+        Vector3 savedOldPos = Vector3.zero;
+        int posIndex = 0;
+        for (int i = 0; i < oldPos.Length; i++)
+        {
+            Debug.Log($"SpriteObjName: {oldPos[i].name}");
+            if (oldPos[i].tag == "ActorSprite")
+            {
+                posIndex = i;
+            }
+        }
+
+        if (oldPos[posIndex].gameObject.tag == "ActorSprite")
+        {
+            savedOldPos = oldPos[posIndex].position;
+            bool phaseOne = false;
+            bool phaseTwo = false;
+            float timer = 0f;
+            float endTime = 0.15f;
+            while (timer < endTime)
+            {
+                oldPos[posIndex].position = Vector3.Lerp(savedOldPos, savedOldPos + dirInt, timer * (1f / endTime));
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            timer = 0f;
+            endTime = 0.1f;
+            while (timer < endTime)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
+
+            timer = 0f;
+            endTime = 0.05f;
+            Vector3 oldDestPos = oldPos[posIndex].position;
+            while (timer < endTime)
+            {
+                oldPos[posIndex].position = Vector3.Lerp(oldDestPos, savedOldPos, timer * (1f / endTime));
+                timer += Time.deltaTime;
+                yield return null;
+            }
+            oldPos[posIndex].position = savedOldPos;
+        }
+        else
+        {
+            Debug.LogError($"MISSING ACTOR SPRITE: {myActor.gameObject.name}");
+        }
+
+        #endregion
+        
+        // Continue action calcs
         Actor victim = TurnSystem.instance.GetActorAtTile(TurnSystem.instance.GetTilemap().WorldToCell(
             myActor.GetPosition()
             + dir));

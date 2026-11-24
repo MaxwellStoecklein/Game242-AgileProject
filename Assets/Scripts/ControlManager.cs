@@ -157,8 +157,8 @@ public class ControlManager : MonoBehaviour
 
     bool CheckDiagonalInput(Vector2 dir)
     {
-        float angle = Vector2.Angle(Vector2.right, dir);
-
+        float angle = Vector2.SignedAngle(Vector2.right, dir);
+        //Debug.Log($"CheckDiag: {angle}");
         if (
             (angle > 30f && angle <= 60f) ||
             (angle > 120f && angle <= 150f) ||

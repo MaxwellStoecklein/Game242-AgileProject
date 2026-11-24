@@ -15372,6 +15372,7 @@ MonoBehaviour:
   panelPrefab: {fileID: 1240324699563840830, guid: 31c7b7b4fc5550507a2529aadc946047, type: 3}
   textPrefab: {fileID: 7023241117375615870, guid: df2ba3064b9df5f7490db57c49822c09, type: 3}
   discreetButtonPrefab: {fileID: 3586566323400716613, guid: 653de069e7b31fab296a59806eb23d79, type: 3}
+  damageTextPrefab: {fileID: 6126777429236591485, guid: 36a278d582bbab455a26eded69b6b608, type: 3}
   currentMenu: {fileID: 0}
   rootMenu: {fileID: 908653258}
   cursor: {fileID: 893814739}

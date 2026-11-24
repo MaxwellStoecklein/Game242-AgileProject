@@ -20,6 +20,7 @@ public abstract class Actor : MonoBehaviour
     [SerializeField] protected Vector3 position;
     [SerializeField] protected Vector2 facingRotation;
     [SerializeField] protected GameObject selectionPointer;
+    [SerializeField] protected GameObject aimPointer;
     [SerializeField] protected bool isLeader;
 
     [SerializeField] protected StatSheet statSheet;
@@ -131,7 +132,11 @@ public abstract class Actor : MonoBehaviour
 
     public void Hit(int damage)
     {
-        health -= damage - defense / 2;
+        int damageTaken = damage - defense / 2;
+        health -= damageTaken;
+        
+        // Animation
+        UIManager.instance.RequestDamageNumberUI(this.gameObject, damageTaken);
     }
 
     public void Rotate(Vector2 rotDir)
@@ -139,6 +144,10 @@ public abstract class Actor : MonoBehaviour
         facingRotation = rotDir;
         
         // TODO: Change sprite to new rotation.
+        float angle = Vector2.SignedAngle(Vector2.up, rotDir);
+        Vector3 targetRotation = new Vector3(0f, 0f, angle);
+        Quaternion euler = Quaternion.Euler(targetRotation);
+        aimPointer.transform.rotation = Quaternion.RotateTowards(aimPointer.transform.rotation, euler, 999f);
     }
 
     public void MoveTick(float timer, float duration, Vector3 destination)

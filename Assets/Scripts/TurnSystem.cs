@@ -70,7 +70,7 @@ public class TurnSystem : MonoBehaviour
                 continue;
             }
             
-            if (actors.FindAll(FindPlayer).Count < 4)
+            if (actors.FindAll(FindPlayer).Count < 1)
             {
                 if (RngManager.instance.SpawnRandom.NextInt(0, 2) == 0)
                 {
@@ -314,6 +314,12 @@ public class TurnSystem : MonoBehaviour
     {
         float timer = 0f;
         float gameSpeed = 0.5f; // TODO: When creating config system, make this configurable
+
+        foreach (var queuedActor in moveQueue)
+        {
+            //Debug.Log($"RotateDir: {queuedActor.Value.destination - queuedActor.Key.GetPosition()}");
+            queuedActor.Key.Rotate(queuedActor.Value.destination - queuedActor.Key.GetPosition());
+        }
         
         while (timer < gameSpeed)
         {
